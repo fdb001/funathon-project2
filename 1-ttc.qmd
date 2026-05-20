@@ -239,24 +239,44 @@ print(f"Example: '{train['label'][0]}' → {encoder.inverse_transform(y_train[:1
 
 # Applying a tokenizer
 
-Neural networks cannot process raw text directly — they work with numbers. A **tokenizer**
-is the component that bridges this gap: it splits a text into small units called **tokens**
-(words, subwords, or characters) and maps each token to a unique integer ID.
+## Why tokenization?
 
-For example, the sentence *"I sell croissants and pains au chocolat"* might be split into tokens
-`["i", "sell'", "croissants", "and", "pains", "au", "chocolat"]` and encoded as `[326, 40, 199, 126, 20, 755, 1024]`.
+Neural networks can only work with numbers because they have no notion of letters or words. A **tokenizer** is the component that bridges this gap: it converts raw text into a sequence of integers that the model can process.
 
-The sequence of IDs is then padded or truncated to a fixed length (`output_dim`) so that
-all inputs have the same shape, which is required for batched training.
+The process has three steps:
+
+1. **Split** the text into small units called **tokens**: these can be whole words, subword fragments, or individual characters.
+2. **Map** each token to a unique integer using a fixed vocabulary (a lookup table built during training).
+3. **Pad or truncate** the resulting sequence to a fixed length so that all inputs have the same shape, which is required for batched training.
+
+The diagram below illustrates this pipeline on a short example:
+
+```mermaid
+flowchart LR
+    A["\"I sell croissants\""] -->|"split into tokens"| B["[\"i\", \"sell\", \"croi\", \"##ssants\"]"]
+    B -->|"look up in vocabulary"| C["[45, 112, 87, 203]"]
+    C -->|"pad to length 6"| D["[45, 112, 87, 203, 0, 0]"]
+```
+
+## Why subword tokenization?
+
+There are several ways to split text into tokens: by character, by full word, or by subword fragment. Each has trade-offs:
+
+| Strategy | Example for *"croissants"* | Problem |
+|---|---|---|
+| Character-level | `["c","r","o","i","s","s","a","n","t","s"]` | Sequences become very long; meaning is hard to capture |
+| Word-level | `["croissants"]` | Rare or misspelled words get mapped to `[UNKNOWN]` |
+| **Subword (WordPiece)** | `["croi", "##ssants"]` | Handles rare words without losing common subparts |
+
+**WordPiece**, the algorithm used here, builds a vocabulary of frequent subword units from the training corpus. Words it has never seen can still be represented by combining known fragments. The `##` prefix marks a fragment that continues the previous token (i.e. it is not the start of a new word).
+
+Because the vocabulary is learned from your data, it naturally adapts to domain-specific vocabulary — in our case, French business descriptions full of technical terms.
 
 ::: {.callout-note appearance="simple" collapse="true"}
-## What is WordPiece?
-WordPiece is a **subword tokenization** algorithm. Rather than splitting on spaces (word-level)
-or individual characters, it finds a vocabulary of frequent subword units that can represent
-any word — including rare or unseen ones. For instance, *"informatiques"* might be split into
-`["informat", "##iques"]`. The `##` prefix indicates that the token is a continuation of the
-previous one. Because the vocabulary is built from your training corpus, it adapts well to
-domain-specific text like French business descriptions.
+## Want to go further?
+
+- The [Hugging Face tokenizer documentation](https://huggingface.co/docs/transformers/tokenizer_summary) gives a clear overview of the main tokenization strategies (BPE, WordPiece, Unigram).
+- The [Hugging Face tokenizers course chapter](https://huggingface.co/learn/nlp-course/chapter6/1) is a hands-on introduction for beginners.
 :::
 
 ::: {.callout-tip collapse="false" icon=false}
