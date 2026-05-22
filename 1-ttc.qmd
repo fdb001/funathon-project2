@@ -445,7 +445,7 @@ Define a `TrainingConfig` and train on a small subsample so it completes quickly
 
 ::: {.callout-note appearance="simple" collapse="true"}
 ## Play with hyperparameters
-Of course, you can play with hyperparameters if you want: add more epochs, change the learning rate and the batch size... Remember that you are training the model using CPUs, so avoid big models that will take a lot of time to train.
+Of course, you can play with hyperparameters if you want: add more epochs, change the learning rate and the batch size... But __remember that you are training the model using CPUs, so avoid big models that will take a lot of time and resources to train__.
 :::
 
 
@@ -553,7 +553,7 @@ print(ttc_loaded)
 
 ## Question 3 — Load the pretrained model from MLflow
 
-We provide a **pretrained model** trained on the full dataset.
+We provide a **pretrained model** trained on the full dataset with many epochs.
 Load it as such:
 
 ```{python}
