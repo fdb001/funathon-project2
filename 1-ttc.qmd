@@ -574,10 +574,22 @@ print(ttc_loaded)
 
 :::
 
-## Question 3 — Load the pretrained model from MLflow
+# Prediction and explainability
 
-We provide a **pretrained model** trained on the full dataset with many epochs.
-Load it as such:
+Once the model is trained, we can use it to predict NACE codes for new text descriptions. Beyond a simple prediction, we also want to understand why a given NACE code was predicted — specifically, which words in the input text contributed the most to the decision. To understand which words influenced a prediction, we use a technique called **integrated gradients** (via Captum's `LayerIntegratedGradients`). It assigns a score to each word in the input: a high score means that word pushed the model toward the predicted class. You can refer to this [tutorial](https://inseefrlab.github.io/torchTextClassifiers/tutorials/explainability.html) on explainability for more details.
+
+::: {.callout-important}
+## On the interpretation of integrated gradients
+Scores based on integrated gradients are a useful guide, not a definitive explanation. Treat them as a way to explore the model's behavior, __not as proof of causality__.
+:::
+
+
+::: {.callout-tip collapse="false" icon=false}
+## `<i class="bi bi-book"></i>`{=html} Exercice 5: Generate predictions and inspect attributions
+
+## Question 0 — Load the pretrained model from MLflow
+
+We provide a **pretrained model** trained on the full dataset with many epochs. Load it using this code:
 
 ```{python}
 #| label: load-public
@@ -594,25 +606,6 @@ ttc = torchTextClassifiers.load(local_dir)
 ttc.pytorch_model.eval()
 
 ```
-
-:::
-
-# Prediction and explainability
-
-Once the model is trained, we can use it to predict NACE codes for new text descriptions.
-Beyond a simple prediction, we also want to understand why a given NACE code was predicted — specifically, which words in the input text contributed the most to the decision.
-
-You can refer to this [tutorial](https://inseefrlab.github.io/torchTextClassifiers/tutorials/explainability.html) on explainability for more details.
-
-To understand which words influenced a prediction, we use a technique called **integrated gradients** (via Captum's `LayerIntegratedGradients`). It assigns a score to each word in the input: a high score means that word pushed the model toward the predicted class.
-
-::: {.callout-important}
-## On the interpretation of integrated gradients
-These scores are a useful guide, not a definitive explanation. Treat them as a way to explore the model's behavior, not as proof of causality.
-:::
-
-::: {.callout-tip collapse="false" icon=false}
-## `<i class="bi bi-book"></i>`{=html} Exercice 5: Generate predictions and inspect attributions
 
 ## Question 1 — Generate top-5 predictions with confidence scores
 
